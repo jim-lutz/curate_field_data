@@ -1,5 +1,5 @@
 # libreoffice lock files
-.doc#
+*.doc#
 
 # History files
 .Rhistory

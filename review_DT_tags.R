@@ -171,3 +171,8 @@ sort(unique(DT_tags[is.na(moteID) & !is.na(houseID),other]))
   # [11] "www.google.com minimum latency"     "www.google.com rate of pin success"
 # so keep !is.na(moteID) & !is.na(houseID)
 
+# save the field data uuids
+DT_field_data_uuid <- DT_tags[!is.na(moteID) & !is.na(houseID), 
+                              list(uuid, houseID, moteID, sensortype, source)]
+save(DT_field_data_uuid, file = paste0(wd_data,"DT_field_data_uuid.RData"))
+

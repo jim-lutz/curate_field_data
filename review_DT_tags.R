@@ -29,6 +29,10 @@ setnames(DT_tags,old="sensorID", new = "moteID")
 DT_tags[!is.na(moteID),]
 # 2511 records
 
+# look at moteID
+length(sort(unique(DT_tags[!is.na(moteID),moteID])))
+# [1] 253
+
 # look at all the variables to see which could be dropped
 names(DT_tags)
   # [1] "source"     "path"       "house"      "moteID"     "sensortype" "units"     
@@ -51,6 +55,20 @@ length(sort(unique(DT_tags[!is.na(moteID),path])))
   # [1] 1707
 # probably don't neet to keep path.
 
+DT_tags[,path]
+DT_tags[!(path %like% "hwds_test"), other]
+# this is only about things like latency and ping success, probably don't need that.
+unique(DT_tags[(path %like% "hwds_test"), other])
+# these are all NA, not useful
+
+# check it hwds_test means there was a moteID
+DT_tags[(path %like% "hwds_test"), ]
+# 2612
+DT_tags[!is.na(moteID), ]
+# 2511 what are the 101 that are different?
+DT_tags[(path %like% "hwds_test"), ][is.na(moteID), ]
+# these are the net_reliabilty and net_reliability, probably don't need if is.na(moteID)
+
 sort(unique(DT_tags[!is.na(moteID),house]))
   #  [1] "1"  "1 " "10" "11" "13" "14" "16" "17" "18" "19" "2"  "20" "21" "22" "24" "25"
   # [17] "3"  "3 " "35" "4 " "5 " "6 " "7 " "9 "
@@ -65,6 +83,10 @@ sort(unique(DT_tags[!is.na(moteID),houseID]))
 # missing 8, 12, 15, & 23
 
 # what's house 35?
-DT_tags[!is.na(moteID),][house==35]
+DT_tags[!is.na(moteID),][houseID==35]
 # apparently has data, probably typo into SMap data.
+
+sort(unique(DT_tags[!is.na(moteID),houseID]))
+
+
 

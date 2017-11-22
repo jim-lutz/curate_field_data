@@ -111,3 +111,37 @@ unique(DT_tags[!is.na(moteID),type])
   # [1] "double" "long"  
 unique(DT_tags[!is.na(moteID),list(type,sensortype)])
 # flow & temp are double, sensor is long
+
+# study?
+unique(DT_tags[!is.na(moteID),study])
+  # [1] "LBNL" 
+# don't bother keeping.
+
+# model?
+unique(DT_tags[!is.na(moteID),model])
+  # [1] "HWDS Flow Meters"
+unique(DT_tags[,model])
+# [1] "HWDS Flow Meters" NA                
+unique(DT_tags[is.na(moteID),model])
+# [1] NA                 "HWDS Flow Meters"
+# don't bother keeping.
+
+# timezone?
+unique(DT_tags[,timezone])
+  # [1] "America/Los_Angeles"
+# don't bother keeping.
+
+# driver?
+unique(DT_tags[,driver])
+  # [1] "smap.drivers.mote.MoteDriver"       "smap.drivers.ping_drvr.chk_latency"
+unique(DT_tags[!is.na(moteID),driver])
+  # [1] "smap.drivers.mote.MoteDriver"
+# don't bother keeping.
+
+# other?
+unique(DT_tags[!is.na(moteID),other])
+  # [1] NA
+# don't bother keeping.
+
+
+

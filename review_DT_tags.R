@@ -139,9 +139,35 @@ unique(DT_tags[!is.na(moteID),driver])
 # don't bother keeping.
 
 # other?
-unique(DT_tags[!is.na(moteID),other])
-  # [1] NA
+unique(DT_tags[!is.na(moteID),other])# [1] NA
 # don't bother keeping.
 
-
+# double check relation between moteID and houseID
+DT_tags[!is.na(moteID),]
+#2511
+DT_tags[!is.na(houseID),]
+# 2687
+# compare the counts
+with(DT_tags,
+     table(is.na(moteID), is.na(houseID), useNA = "ifany" )
+    )
+  #       FALSE TRUE
+  # FALSE  2278  233
+  # TRUE    409   27
+DT_tags[!is.na(moteID) & !is.na(houseID),]
+# 2278
+sort(unique(DT_tags[!is.na(moteID) & is.na(houseID),source]))
+  # [1] "HWDS_dev"              "HWDS Pre-install test" "HWDS test (beagle4)"
+  # 233
+sort(unique(DT_tags[is.na(moteID) & is.na(houseID),source]))
+  # [1] "HWDS Pre-install test" "HWDS test (beagle4)"
+  # 27
+sort(unique(DT_tags[is.na(moteID) & !is.na(houseID),other]))
+  # [1] "128.3.28.51 maximum latency"        "128.3.28.51 median latency"        
+  # [3] "128.3.28.51 minimum latency"        "128.3.28.51 rate of pin success"   
+  # [5] "128.8.237.77 maximum latency"       "128.8.237.77 median latency"       
+  # [7] "128.8.237.77 minimum latency"       "128.8.237.77 rate of pin success"  
+  # [9] "www.google.com maximum latency"     "www.google.com median latency"     
+  # [11] "www.google.com minimum latency"     "www.google.com rate of pin success"
+# so keep !is.na(moteID) & !is.na(houseID)
 

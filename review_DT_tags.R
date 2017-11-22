@@ -86,7 +86,23 @@ sort(unique(DT_tags[!is.na(moteID),houseID]))
 DT_tags[!is.na(moteID),][houseID==35]
 # apparently has data, probably typo into SMap data.
 
-sort(unique(DT_tags[!is.na(moteID),houseID]))
+# what to do about sensortype
+sort(unique(DT_tags[!is.na(moteID),sensortype]))
+  # [1] "batt_volt" "flowA"     "flowB"     "sensorA"   "sensorB"   "tempA"    
+  # [7] "tempB"    
 
+# what to do about units
+sort(unique(DT_tags[!is.na(moteID),units]))
+  # [1] "degC" "GPM"  "N/A"  "V"   
 
+# do units correspond exactly with sensortype?
+unique(DT_tags[!is.na(moteID) & sensortype %like% "flow", units ])
+  # [1] "GPM"
+unique(DT_tags[!is.na(moteID) & sensortype %like% "temp", units ])
+  # [1] "degC"
+unique(DT_tags[!is.na(moteID) & sensortype %like% "batt", units ])
+  # [1] "V"
+unique(DT_tags[!is.na(moteID) & sensortype %like% "sensor", units ])
+  # [1] "N/A"
+# don't need units if have sensortype
 

@@ -27,6 +27,7 @@ setnames(DT_tags,old="sensorID", new = "moteID")
 
 # see if only moteID is good enough
 DT_tags[!is.na(moteID),]
+# 2511 records
 
 # look at all the variables to see which could be dropped
 names(DT_tags)
@@ -48,12 +49,20 @@ sort(unique(DT_tags[!is.na(moteID),source]))
 
 length(sort(unique(DT_tags[!is.na(moteID),path])))
   # [1] 1707
-# probably don't neet to keep this.
+# probably don't neet to keep path.
 
 sort(unique(DT_tags[!is.na(moteID),house]))
   #  [1] "1"  "1 " "10" "11" "13" "14" "16" "17" "18" "19" "2"  "20" "21" "22" "24" "25"
   # [17] "3"  "3 " "35" "4 " "5 " "6 " "7 " "9 "
 # what's 35? some of the values have trailing spaces, will have to get rid of those.
+
+# change house to houseID numeric
+DT_tags[,houseID:=as.numeric(house)]
+str(DT_tags)
+
+sort(unique(DT_tags[!is.na(moteID),houseID]))
+# [1]  1  2  3  4  5  6  7  9 10 11 13 14 16 17 18 19 20 21 22 24 25 35
+# missing 8, 12, 15, & 23
 
 # what's house 35?
 DT_tags[!is.na(moteID),][house==35]

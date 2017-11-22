@@ -106,3 +106,8 @@ unique(DT_tags[!is.na(moteID) & sensortype %like% "sensor", units ])
   # [1] "N/A"
 # don't need units if have sensortype
 
+# what about type
+unique(DT_tags[!is.na(moteID),type])
+  # [1] "double" "long"  
+unique(DT_tags[!is.na(moteID),list(type,sensortype)])
+# flow & temp are double, sensor is long

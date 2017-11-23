@@ -65,7 +65,25 @@ for(d in 1:7) {uuids[d] = data[[d]]$uuid}
 identical(uuids,DT_field_data_uuid[moteID==this_mote,uuid])
   # [1] TRUE
 
+# start building the summary information about this data set
+DT_moteID_summary <- DT_field_data_uuid[moteID==this_mote,list(houseID,moteID,uuid,sensortype)]
 
+# get the first and last time stamp of each data stream
+uuid <- as.character()
+first_time <- as.numeric()
+last_time <- as.numeric()
+ndata <- as.numeric()
+summ <- as.numeric
 
+for(d in 1:7) {
+  uuid[d]       = data[[d]]$uuid
+  first_time[d] = min(data[[d]]$time)
+  last_time[d]  = max(data[[d]]$time)
+  ndata         = length(data[[d]]$time)
+  summ          <- as.numeric(summary(data[[d]]$value))
+  }
+DT_moteID_data_summary <- data.table(uuid,first_time,last_time, ndata, t(summ))
+
+merge(DT_moteID_summary,DT_moteID_data_summary,by="uuid")
 
 

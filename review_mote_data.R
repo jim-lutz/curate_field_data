@@ -46,13 +46,26 @@ load(file = paste0(wd_mote_data, mote_fn))
 # see what it looks like
 head(data)
 str(data)
-# it's the data streams from 7 uuids
+length(data)
+  # [1] 7
+  # it's the data streams from 7 uuids
+length(data[[1]])
+  # [1] 3
+  # each item in the original list is a list of 3 items
+length(data[[1]][[2]])
+  # [1] 185907
+  # the length of the 2nd list of 3 in the 1st list of 7
+
 # list the uuids
-data[3,3]
-data[[]]$uuid
+data[[1]]$uuid
 uuids=""
 for(d in 1:7) {uuids[d] = data[[d]]$uuid}
 
 # see if uuids matches from DT_field_data_uuid
 identical(uuids,DT_field_data_uuid[moteID==this_mote,uuid])
   # [1] TRUE
+
+
+
+
+

@@ -9,6 +9,9 @@ source("setup.R")
 # set up paths to working directories
 source("setup_wd.R")
 
+# call useful functions
+source("functions.R")
+
 # path to mote files
 wd_mote_data = "/home/jiml/HotWaterResearch/projects/HWDS monitoring/retrieve_field_data/data/by_sensorID/"
 
@@ -77,13 +80,15 @@ summ <- as.numeric
 
 for(d in 1:7) {
   uuid[d]       = data[[d]]$uuid
-  first_time[d] = min(data[[d]]$time)
-  last_time[d]  = max(data[[d]]$time)
+  first_time[d] = readUTCmilliseconds(min(data[[d]]$time))
+  last_time[d]  = readUTCmilliseconds(max(data[[d]]$time))
   ndata         = length(data[[d]]$time)
   summ          <- as.numeric(summary(data[[d]]$value))
   }
 DT_moteID_data_summary <- data.table(uuid,first_time,last_time, ndata, t(summ))
 
 merge(DT_moteID_summary,DT_moteID_data_summary,by="uuid")
+# values aren't being read correctly
+
 
 

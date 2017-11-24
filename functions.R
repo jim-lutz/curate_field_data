@@ -35,17 +35,26 @@ writeUTCmilliseconds <-function(datetime){
 }
 
 
-get_dt_uuid <- function(uuid_num,ll_data) {
-  # function to return one uuid from a ll_data Rsmap data structure as a data.table
-  # uuid_num is a number corresponding to 
-  # "flowA"     "tempA"     "sensorA"   "flowB"     "tempB"     "sensorB"   "batt_volt"
-  
-  eval(parse( text = paste0("data.table(",
-                            "time = ll_data[[uuid_num]][[1]]$time,",
-                            eval(datastreams[uuid_num])," = ll_data[[uuid_num]][[1]]$value)" 
-  )
-  )
-  )
-  
+get_uuid  <- function(l_data) {
+  # function to read the uuid from a single Rsmap data structure list.
+  # l_data = List of 3
+    # $ time : num [1:x] 
+    # $ value: num [1:x]
+    # $ uuid : chr 
+
+  # get the uuid
+  return(l_data$uuid )
 }
+
+get_uuid_data <- function(l_data) {
+  # function to read all the data from a single Rsmap data structure list.
+  # l_data = List of 3
+    # $ time : num [1:x] 
+    # $ value: num [1:x]
+    # $ uuid : chr 
+  
+  # get the data
+  return(data.table( time = l_data$time, value = l_data$value))
+}
+
 

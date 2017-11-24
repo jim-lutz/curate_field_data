@@ -71,6 +71,15 @@ identical(uuids,DT_field_data_uuid[moteID==this_mote,uuid])
 # start building the summary information about this data set
 DT_moteID_summary <- DT_field_data_uuid[moteID==this_mote,list(houseID,moteID,uuid,sensortype)]
 
+# get the datastream from one uuid
+l_data <- data[[1]]
+str(l_data)
+
+# turn that into a data.table
+get_uuid(l_data)
+get_uuid_data(l_data)
+
+
 # get the first and last time stamp of each data stream
 uuid <- as.character()
 first_time <- as.numeric()

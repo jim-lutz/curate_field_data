@@ -19,7 +19,8 @@ wd_mote_data = "/home/jiml/HotWaterResearch/projects/HWDS monitoring/retrieve_fi
 # get the moteID files.
 fn_motes <- Sys.glob(paste0(wd_mote_data,"RSmap.x*.RData"))
 
-# try one moteID
-fn_moteID <- fn_motes[211]
+# get data from all the moteIDs
+DT_uuids_data <- get_DT_uuids_data(fn_motes)
 
-DT_uuids_data <- get_DT_uuids_data(fn_moteID)
+# see what we got
+DT_uuids_data[,list(nrows=length(time)),by=uuid]

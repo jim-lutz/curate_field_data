@@ -22,19 +22,4 @@ fn_motes <- Sys.glob(paste0(wd_mote_data,"RSmap.x*.RData"))
 # try one moteID
 fn_moteID <- fn_motes[211]
 
-get_DT_uuids_data <- function(fn_moteID){
-  # function to read all the data from all Rsmap data structures in a file
-
-  # load the list of data lists into data
-  load(file = fn_moteID)
-  str(data)
-  
-  # call get_DT_uuids_data on every data list in the list
-  ldply(.data=data, .fun =get_DT_uuid_data(), .progress= "text")
-    
-  # return the data as a data.table with uuid as a field
-  # not very efficient but puts everything in one record
-  return(data.table( uuid = l_data$uuid, time = l_data$time, value = l_data$value))
-}
-
-
+DT_uuids_data <- get_DT_uuids_data(fn_moteID)

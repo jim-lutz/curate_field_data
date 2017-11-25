@@ -34,29 +34,6 @@ writeUTCmilliseconds <-function(datetime){
   
 }
 
-
-get_uuid  <- function(l_data) {
-  # function to read the uuid from a single Rsmap data structure list.
-  # l_data = List of 3
-    # $ time : num [1:x] 
-    # $ value: num [1:x]
-    # $ uuid : chr 
-
-  # get the uuid
-  return(l_data$uuid )
-}
-
-get_uuid_data <- function(l_data) {
-  # function to read all the data from a single Rsmap data structure list.
-  # l_data = List of 3
-    # $ time : num [1:x] 
-    # $ value: num [1:x]
-    # $ uuid : chr 
-  
-  # return the data as a data.table
-  return(data.table( time = l_data$time, value = l_data$value))
-}
-
 get_DT_uuid_data <- function(l_data){
   # function to read all the data from a single Rsmap data structure list.
   # l_data = List of 3
@@ -69,16 +46,20 @@ get_DT_uuid_data <- function(l_data){
   return(data.table( uuid = l_data$uuid, time = l_data$time, value = l_data$value))
 }
 
-get_DT_uuids_data <- function(l_moteID){
-  # function to read all the data from all Rsmap data structures in a moteID list.
-  # l_data = List of 3
-  # $ time : num [1:x] 
-  # $ value: num [1:x]
-  # $ uuid : chr 
-  
+get_DT_uuids_data <- function(fn_moteID){
+  # function to read all the data from all Rsmap data structures in a file
   # return the data as a data.table with uuid as a field
   # not very efficient but puts everything in one record
-  return(data.table( uuid = l_data$uuid, time = l_data$time, value = l_data$value))
+  
+  # load the list of data lists into data
+  load(file = fn_moteID)
+  
+  # call get_DT_uuids_data on every data list in the list
+  DT_uuids_data <- data.table(ldply(.data=data, .fun =get_DT_uuid_data, .progress= "text"))
+  
+  # clean up the data
+  rm(data)
+  
+  return(DT_uuids_data)
 }
-
 

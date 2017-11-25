@@ -41,6 +41,10 @@ library(tidyverse)
 if(!require(data.table)){install.packages("data.table")}
 library(data.table)
 
+# work with plyr 
+if(!require(plyr)){install.packages("plyr")}
+library(plyr)
+
 # work with ggplot2
 # if(!require(ggplot2)){install.packages("ggplot2")}
 # library(ggplot2)

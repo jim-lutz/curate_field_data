@@ -55,7 +55,7 @@ get_DT_moteID_data <- function(fn_moteID){
   load(file = fn_moteID)
   
   # call get_DT_uuids_data on every data list in the list
-  DT_moteID_data <- data.table(ldply(.data=data, .fun =get_DT_uuid_data, .progress= "text"))
+  DT_moteID_data <- data.table(ldply(.data=data, .fun =get_DT_uuid_data, .progress= "text", .inform=TRUE))
   
   # clean up the data
   rm(data)
@@ -69,7 +69,10 @@ get_DT_uuids_data <- function(fn_motes){
   # not very efficient but puts everything in one record
   
   # call get_DT_uuids_data on every data list in the list
-  DT_uuids_data <- data.table(ldply(.data=fn_motes, .fun =get_DT_moteID_data, .progress= "text"))
+  DT_uuids_data <- data.table(ldply(.data=fn_motes, 
+                                    .fun =get_DT_moteID_data, 
+                                    .progress= "text", 
+                                    .inform=TRUE))
   
   return(DT_uuids_data)
 }

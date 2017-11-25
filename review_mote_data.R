@@ -26,7 +26,7 @@ tables()
 DT_field_data_uuid
 
 # count of motes by houseID
-DT_field_data_uuid[,length(unique(moteID)),by=houseID][order(houseID)]
+DT_field_data_uuid[,list(nmotes=length(unique(moteID))),by=houseID][order(houseID)]
 
 # list all the motes from houseID 7
 sort(unique(DT_field_data_uuid[houseID==7,moteID]))
@@ -43,7 +43,7 @@ DT_field_data_uuid[moteID==this_mote,uuid]
 
 # load data for this mote 
 mote_fn = paste0("RSmap.",this_mote,".raw.xz.RData")
-#  the DT_field_data_uuid data.table
+#  get the data from RSmap.this_mote.raw.xz.RData
 load(file = paste0(wd_mote_data, mote_fn))
 
 # see what it looks like
@@ -76,9 +76,12 @@ l_data <- data[[1]]
 str(l_data)
 
 # turn that into a data.table
-get_uuid(l_data)
-get_uuid_data(l_data)
+DT_data <- get_DT_uuid_data(l_data = l_data)
 
+
+
+nchar(uuid)
+# [1] 36
 
 # get the first and last time stamp of each data stream
 uuid <- as.character()

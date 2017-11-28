@@ -1,0 +1,17 @@
+flowchart of curate_field_data R project
+
+review_DT_tags.R
+  script to review information in DT_tags.RData
+  input:  ../retrieve_field_data/data/DT_tags.RData
+  output: /data/DT_field_data_uuid.RData
+  
+review_mote_data.R
+  script to review information in the mote files in
+  input:  /data/DT_field_data_uuid.RData
+  
+get_uuid_data.R
+  script to collect all the uuid information in
+  input:  /data/DT_field_data_uuid.RData
+          ../retrieve_field_data/data/by_sensorID/RSmap.x*.RData
+  
+  

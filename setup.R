@@ -24,6 +24,10 @@ sessionInfo()
   # Platform: x86_64-pc-linux-gnu (64-bit)
   # Running under: Ubuntu 16.04.3 LTS
 
+# work with plyr 
+if(!require(plyr)){install.packages("plyr")}
+library(plyr)
+
 # work with tidyverse
 # http://tidyverse.org/
 # needed libxml2-dev installed
@@ -40,10 +44,6 @@ library(tidyverse)
 #https://www.datacamp.com/courses/data-analysis-the-data-table-way
 if(!require(data.table)){install.packages("data.table")}
 library(data.table)
-
-# work with plyr 
-if(!require(plyr)){install.packages("plyr")}
-library(plyr)
 
 # work with ggplot2
 # if(!require(ggplot2)){install.packages("ggplot2")}

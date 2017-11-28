@@ -1,8 +1,8 @@
 # get_uuid_data.R
 # script to collect all the uuid information in
 # /home/jiml/HotWaterResearch/projects/HWDS monitoring/retrieve_field_data/data/by_sensorID
-# make one long data.table of uuid, time, value by houseID 
-# Jim Lutz "Sat Nov 25 13:06:14 2017"
+# make one long data.table of uuid, time, value by houseID & moteID
+# Jim Lutz 
 
 # set packages & etc
 source("setup.R")
@@ -82,13 +82,25 @@ DT_field_data_uuid[,list(n_uuids   = length(unique(uuid)),
 DT_field_data_uuid[houseID==18 & is.na(fn),list(moteID,uuid,fn)][order(uuid)]
 # don't seem to have these files anywhere
 DT_field_data_uuid[houseID==18 & is.na(fn),list(moteID,sensortype,uuid)][order(moteID,sensortype)]
+# it's 3 different moteIDs
+DT_field_data_uuid[houseID==18 & is.na(fn),list(length(uuid)),by=moteID][order(moteID)]
 
-# get all the fns with a moteID for a houseID
+
+# get all the moteIDs for a houseID
 this_houseID = 5  # try one houseID
-l_fns <- DT_field_data_uuid[houseID==this_houseID & !is.na(fn),]$fn
 
-# get data from all the moteIDs
-DT_uuids_data <- get_DT_uuids_data(l_fns)
-# R Session Aborted. Error: cannot allocate vector of size 948.4 Mb
-# Well that's not going to work!
-# try it by houseID & sensorID?
+# list of moteIDs for this houseID
+l_moteIDs <- sort(unique(DT_field_data_uuid[houseID==this_houseID & !is.na(fn),]$moteID))
+
+# try one moteID
+this_moteID = l_moteIDs[5]
+fn_moteID = unique(DT_field_data_uuid[houseID==this_houseID & moteID==this_moteID]$fn)
+
+# get all the data from one moteID
+DT_moteID_data <- get_DT_moteID_data(fn_moteID)
+
+# check how many uuids
+DT_moteID_data[,list(uuid=unique(uuid))][order(uuid)]
+# 14? expected only 7, maybe put out second set of sensors after thermistor leak fix?
+
+

@@ -98,9 +98,33 @@ fn_moteID = unique(DT_field_data_uuid[houseID==this_houseID & moteID==this_moteI
 
 # get all the data from one moteID
 DT_moteID_data <- get_DT_moteID_data(fn_moteID)
+setkey(DT_moteID_data,uuid)
 
 # check how many uuids
 DT_moteID_data[,list(uuid=unique(uuid))][order(uuid)]
 # 14? expected only 7, maybe put out second set of sensors after thermistor leak fix?
 
+# see what's in it.
+str(DT_moteID_data)
 
+# add the sensortype
+DT_sensortype_uuid <- DT_field_data_uuid[houseID==this_houseID & moteID==this_moteID, list(uuid,sensortype)]
+setkey(DT_field_data_uuid,uuid)
+
+# merge sensortype into DT_moteID_data
+DT_moteID_sensortype <- merge(DT_moteID_data,DT_sensortype_uuid)
+
+# check if any sensortypes missing
+DT_moteID_sensortype[is.na(sensortype)]
+  # Empty data.table (0 rows) of 4 cols: uuid,time,value,sensortype
+
+# see if it makes sense
+DT_moteID_sensortype[,list(sensortype=unique(sensortype)),by=uuid][order(uuid)]
+
+# find first & last time for each uuid
+DT_moteID_sensortype[,list(first= readUTCmilliseconds(min(time)),
+                           last = readUTCmilliseconds(max(time)),
+                           sensortype = unique(sensortype)
+                           ),
+                     by=uuid][order(first)]
+# in this case we have a gap from 2013-08-16 12:07:03 PDT to 2014-01-08 10:41:50 PST

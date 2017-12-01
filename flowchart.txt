@@ -10,9 +10,8 @@ review_mote_data.R
   input:  /data/DT_field_data_uuid.RData
   
 get_uuid_data.R
-  script to collect all the uuid information in
-  input:  /data/DT_field_data_uuid.RData
-          ../retrieve_field_data/data/by_sensorID/RSmap.x*.RData
-          
-  
+  script to translate all the RSMAP data streams to data.tables, one uuid per file
+  input:  ../retrieve_field_data/data/by_sensorID/*.RData
+          ../retrieve_field_data/data/by_uuid/*.RData
+  output: ./data/uuid/*.RData
   

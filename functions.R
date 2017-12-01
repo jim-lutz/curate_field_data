@@ -61,7 +61,7 @@ put_DT_uuid_data <- function(l_data = data, save_dir = wd_uuid_data){
   
 }
 
-put_SMAP_file <- function(this_fn = fn, save_dir = wd_uuid_data){
+put_SMAP_file <- function(this_fn = fn, save_dir = wd_save_uuid){
   # function to save all the SMAP data streams from one RSMAP file 
   # into uuid.RData files
   # this_fn is the file with a RSMAP data object
@@ -71,21 +71,21 @@ put_SMAP_file <- function(this_fn = fn, save_dir = wd_uuid_data){
   load(this_fn)
   
   # loop through all the data streams in one SMAP object
-  l_ply(.data=data, .fun =put_DT_uuid_data, save_dir = wd_save_uuid, .progress= "text", .inform=TRUE)
+  l_ply(.data=data, .fun =put_DT_uuid_data, save_dir, .progress= "text", .inform=TRUE)
   
   # remove the object
   rm(data)
   
 }
 
-put_SMAP_files <- function(l_fn = l_fns, save_dir = wd_uuid_data){
+put_SMAP_files <- function(l_fn = l_fns, save_dir = wd_save_uuid){
   # function to save all the SMAP data streams from a LIST of RSMAP files 
   # into uuid.RData files
   # l_fn is the list of file names containing RSMAP data objects
   # save_dir is the path to save the uuid.RData files
   
   # loop through all the file names
-  l_ply(.data=l_fn, .fun =put_SMAP_file, save_dir = wd_save_uuid, .progress= "text", .inform=TRUE)
+  l_ply(.data=l_fn, .fun =put_SMAP_file, save_dir, .progress= "text", .inform=TRUE)
   
 }
 

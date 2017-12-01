@@ -27,8 +27,14 @@ wd_save_uuid = "/home/jiml/HotWaterResearch/projects/HWDS monitoring/curate_fiel
 # get list of all the file names in wd_mote_data
 l_fns <- Sys.glob(paths = paste0(wd_mote_data,"*.RData"))
 
-# save all the SMAP objects in one file as data.table RData files
-put_SMAP_files(l_fns[32:37], wd_uuid_data)
+# save all the SMAP objects in files as data.table in uuid.RData files
+put_SMAP_files(l_fns, wd_save_uuid)
+
+# get list of all the file names in wd_uuid_data
+l_fns <- Sys.glob(paths = paste0(wd_uuid_data,"*.RData"))
+
+# save all the SMAP objects in files as data.table in uuid.RData files
+put_SMAP_files(l_fns, wd_save_uuid)
 
 
 

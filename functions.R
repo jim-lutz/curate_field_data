@@ -16,7 +16,6 @@ readUTCmilliseconds <-function(UTCtime){
   
 }
 
-
 writeUTCmilliseconds <-function(datetime){
   # function to translate from human readable to UTC milliseconds
   # assumes %Y-%M-%D %H:%M:%s
@@ -34,16 +33,32 @@ writeUTCmilliseconds <-function(datetime){
   
 }
 
-get_DT_uuid_data <- function(l_data){
-  # function to read all the data from a single Rsmap data structure list.
+put_DT_uuid_data <- function(l_data = data, save_dir = wd_uuid_data){
+  # function to save a single SMAP data stream a file in wd_uuid_data
+  # l_data is one SMAP data stream
   # l_data = List of 3
-    # $ time : num [1:x] 
-    # $ value: num [1:x]
-    # $ uuid : chr 
+  # $ time : num [1:x] 
+  # $ value: num [1:x]
+  # $ uuid : chr 
+  # save_dir is name of directory to save the file to
+  # file name is uuid.RData
+  # data.table name is always just DT_uuid
   
-  # return the data as a data.table with uuid as a field
-  # not very efficient but puts everything in one record
-  return(data.table( uuid = l_data$uuid, time = l_data$time, value = l_data$value))
+  # get the uuid
+  uuid <- l_data$uuid
+  
+  # make the file name
+  uuid_fn = paste0(save_dir,uuid,".RData")
+  
+  # make the data.table
+  DT_uuid <- data.table(time = l_data$time, value = l_data$value)
+  
+  # save the data.table
+  save(DT_uuid, file = uuid_fn)
+  
+  # clean up the data
+  rm(l_data, DT_uuid)
+  
 }
 
 get_DT_moteID_data <- function(fn_moteID){

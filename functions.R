@@ -61,6 +61,25 @@ put_DT_uuid_data <- function(l_data = data, save_dir = wd_uuid_data){
   
 }
 
+put_SMAP_file <- function(this_fn = fn, save_dir = wd_uuid_data){
+  # function to save all the SMAP data streams from one RSMAP file 
+  # into uuid.RData files
+  # this_fn is the file with a RSMAP data object
+  # save_dir is the path to save the uuid.RData files
+  
+  # load the R object from the file. Object should be named data
+  load(this_fn)
+  
+  # loop through all the data streams in one SMAP object
+  l_ply(.data=data, .fun =put_DT_uuid_data, save_dir = wd_save_uuid, .progress= "text", .inform=TRUE)
+  
+  # remove the object
+  rm(data)
+  
+}
+
+
+
 get_DT_moteID_data <- function(fn_moteID){
   # function to read all the data from all Rsmap data structures in a moteID file
   # return the data as a data.table with uuid as a field

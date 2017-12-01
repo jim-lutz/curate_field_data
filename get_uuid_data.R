@@ -28,21 +28,10 @@ wd_save_uuid = "/home/jiml/HotWaterResearch/projects/HWDS monitoring/curate_fiel
 l_fns <- Sys.glob(paths = paste0(wd_mote_data,"*.RData"))
 
 # test on one file name
-this_fn = l_fns[35]
+this_fn = l_fns[32]
 
-# load the R object from the file. Object should be named data
-load(this_fn)
-str(data)
-length(data)
-
-# loop through all the data streams in one SMAP object
-l_ply(.data=data, .fun =put_DT_uuid_data, save_dir = wd_save_uuid, .progress= "text", .inform=TRUE)
-
-
-put_DT_uuid_data(l_data = l_data, save_dir = wd_save_uuid)
-  
-
-
+# save all the SMAP objects in one file as data.table RData files
+put_SMAP_file(this_fn, wd_uuid_data)
 
 
 

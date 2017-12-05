@@ -15,3 +15,10 @@ get_uuid_data.R
           ../retrieve_field_data/data/by_uuid/*.RData
   output: ./data/uuid/*.RData
   
+# get_all_meta.R
+  script to collect all the meta information in
+  input:  ../retrieve_field_data/data/DT_tags_raw.RData
+  output: ./data/DT_meta.RData
+  
+  
+  

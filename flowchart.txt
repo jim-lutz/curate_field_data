@@ -20,5 +20,10 @@ get_uuid_data.R
   input:  ../retrieve_field_data/data/DT_tags_raw.RData
   output: ./data/DT_meta.RData
   
+# get_uuid_meta2.R
+  script to collect number of records, start and end dates of each uuid data stream
+  input:  ./data/DT_meta.RData
+          ./data/uuid/*.RData
+  output: ./DT_meta2.RData
   
   

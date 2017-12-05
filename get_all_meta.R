@@ -57,6 +57,9 @@ sort(unique(DT_tags$house)) # looks like if worked, but house 35?
 DT_tags[,houseID:=as.numeric(house)]
 str(DT_tags)
 
+# remove house, no longer needed
+DT_tags[,house:=NULL]
+
 sort(unique(DT_tags[]$houseID))
 # [1]  1  2  3  4  5  6  7  9 10 11 13 14 16 17 18 19 20 21 22 24 25 35
 # missing 8, 12, 15, & 23
@@ -68,26 +71,42 @@ DT_tags[houseID==35,]
 # get sensorID and sensortype from path
 DT_tags[path %like% "/hwds_test/0x", ':=' (sensorID = str_sub(path,13,17),
                                            sensortype = str_sub(path,19,-1)
-)
-]
-sort(unique(DT_tags$sensorID)) # OK?
+                                           )
+        ]
+sort(unique(DT_tags$sensorID)) # OK? 253 sensors
 sort(unique(DT_tags$sensortype)) # OK, except when sensorID =="x5c2/"
 
 DT_tags[sensorID =="x5c2/", ':=' (sensorID = str_sub(path,13,16),
                                   sensortype = str_sub(path,18,-1)
-)]
+                                  )
+        ]
 
 sort(unique(DT_tags$sensortype)) # OK, that's better
 
+# see which fields don't contain useful information
+unique(DT_tags$Metadata.uuid)
+  # [1] NA                                     "985ef7ef-2309-50c9-8c57-a057687e0ac2"
+DT_tags[,list(n=length(uuid)),by=Metadata.uuid]
+  #                           Metadata.uuid    n
+  # 1:                                   NA 2946
+  # 2: 985ef7ef-2309-50c9-8c57-a057687e0ac2    1
+DT_tags[Metadata.uuid=="985ef7ef-2309-50c9-8c57-a057687e0ac2"]
+DT_tags[uuid=="985ef7ef-2309-50c9-8c57-a057687e0ac2"]
+identical(DT_tags[Metadata.uuid=="985ef7ef-2309-50c9-8c57-a057687e0ac2"],
+          DT_tags[uuid=="985ef7ef-2309-50c9-8c57-a057687e0ac2"]
+          )
+# this field only has one record, and the data is duplicated under uuid, 
+# OK to get rid of column
+DT_tags[,Metadata.uuid:=NULL]
+
 # better order
+str(DT_tags)
 names(DT_tags)
-setcolorder(DT_tags, c('source', 'path', 'house', 'sensorID', 'sensortype', 'units', 'uuid', 
+setcolorder(DT_tags, c('source', 'path', 'houseID', 'sensorID', 'sensortype', 'units', 'uuid', 
                        'type', 'study', 'model', 'timezone', 'driver', 'other'))
 
-# see which fields don't contain useful information
-unique(DT_tags$Metadata.Description)
-  # latency & rate of pin success
-unique(DT_tags$Metadata.uuid)
-DT_tags[Metadata.uuid=="985ef7ef-2309-50c9-8c57-a057687e0ac2"]
+# rename the data.table
+DT_meta <- DT_tags
+rm(DT_tags) # don't really need to do this
 
-
+save(DT_meta, file = paste0(wd_data,"DT_meta.RData"))

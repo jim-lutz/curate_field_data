@@ -120,3 +120,30 @@ get_DT_uuids_data <- function(fn_motes){
   return(DT_uuids_data)
 }
 
+get_uuid_info <- function(fn_uuid){
+  # function to get the number of records and the first & last times
+  # returns a data.table
+  
+  # get the uuid from the filename
+  this_uuid <- str_sub(fn_uuid,-42,-7)
+  
+  # load the data.table
+  load(fn_uuid)
+  
+  # get the number of records
+  nrecs <- nrow(DT_uuid)
+  
+  # get the datetimes of the first and last data fields
+  first <- readUTCmilliseconds(min(DT_uuid[]$time))
+  last  <- readUTCmilliseconds(max(DT_uuid[]$time))
+  
+  # build a data.table to return
+  return(data.table(uuid  = this_uuid,
+                    count = nrecs,
+                    first = first,
+                    last  = last)
+  )
+  
+}
+
+

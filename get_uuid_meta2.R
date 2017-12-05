@@ -20,34 +20,22 @@ load(file = paste0(wd_data,"DT_meta.RData"))
 # list of uuid files 
 fn_uuids <- paste0(wd_uuid,list.files(wd_uuid))
 
+# get data.table of the meta info from all the uuid files
+DT_uuid_info <- data.table(ldply(.data=fn_uuids, 
+                                  .fun =get_uuid_info, 
+                                  .progress= "text", 
+                                  .inform=TRUE))
 
-get_uuid_info <- function(fn_uuid){
-  # function to get the number of records and the first & last times
-  # returns a data.table
-  
-  # get the uuid from the filename
-  this_uuid <- str_sub(fn_uuid,-42,-7)
-  
-  # load the data.table
-  load(fn_uuid, verbose = TRUE)
-  
-  # get the number of records
-  nrecs <- nrow(DT_uuid)
 
-  # get the datetimes of the first and last data fields
-  first <- readUTCmilliseconds(min(DT_uuid[]$time))
-  last  <- readUTCmilliseconds(max(DT_uuid[]$time))
-  
-  # build a data.table to return
-  return(data.table(uuid  = this_uuid,
-                    nrecs = nrecs,
-                    first = first,
-                    last  = last)
-         )
-  
-}
 
-# minimal testing
-this_fn_uuid <- fn_uuids[2]
+# key data.tables by uuid
+setkey(DT_uuid_info,uuid)
+setkey(DT_meta,uuid)
+tables()
 
-str(get_uuid_info(this_fn_uuid))
+# merge uuid info onto meta data
+DT_meta2 <- merge(DT_meta, DT_uuid_info, all.x = TRUE )
+
+# now save it
+save(DT_meta2, file = paste0(wd_data,"DT_meta2.RData"))
+

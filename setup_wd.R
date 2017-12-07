@@ -9,3 +9,6 @@ wd <- getwd()
 wd_data    <- paste(wd,"/data/",sep="")      # use this for interim data files
 wd_charts  <-paste(wd,"/charts/",sep="")     # use this for charts, ggsave puts in /
 
+# path to the uuid files
+wd_uuid <- paste0(wd_data,"uuid/")
+

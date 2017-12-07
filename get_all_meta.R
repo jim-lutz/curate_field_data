@@ -68,15 +68,15 @@ sort(unique(DT_tags[]$houseID))
 DT_tags[houseID==35,]
 # apparently has data, probably typo into SMap data.
 
-# get sensorID and sensortype from path
-DT_tags[path %like% "/hwds_test/0x", ':=' (sensorID = str_sub(path,13,17),
+# get moteID and sensortype from path
+DT_tags[path %like% "/hwds_test/0x", ':=' (moteID = str_sub(path,13,17),
                                            sensortype = str_sub(path,19,-1)
                                            )
         ]
-sort(unique(DT_tags$sensorID)) # OK? 253 sensors
-sort(unique(DT_tags$sensortype)) # OK, except when sensorID =="x5c2/"
+sort(unique(DT_tags$moteID)) # OK? 253 sensors
+sort(unique(DT_tags$sensortype)) # OK, except when moteID =="x5c2/"
 
-DT_tags[sensorID =="x5c2/", ':=' (sensorID = str_sub(path,13,16),
+DT_tags[moteID =="x5c2/", ':=' (moteID = str_sub(path,13,16),
                                   sensortype = str_sub(path,18,-1)
                                   )
         ]
@@ -102,7 +102,7 @@ DT_tags[,Metadata.uuid:=NULL]
 # better order
 str(DT_tags)
 names(DT_tags)
-setcolorder(DT_tags, c('source', 'path', 'houseID', 'sensorID', 'sensortype', 'units', 'uuid', 
+setcolorder(DT_tags, c('source', 'path', 'houseID', 'moteID', 'sensortype', 'units', 'uuid', 
                        'type', 'study', 'model', 'timezone', 'driver', 'other'))
 
 # rename the data.table

@@ -50,10 +50,8 @@ DT_meta2[sensortype %in% c("sensorA","sensorB"),list(moteID, sensortype, count)]
 # pick one of these
 this_uuid <- DT_meta2[moteID == 'x3295' & sensortype == 'sensorB',uuid]
 
-# get the uuid data.table for it
-
-DT_uuid <- get_DT_uuid_data(this_uuid)
-
+# get the sensorID data.table for it
+DT_sensorID_info <- get_sensorID_info(this_uuid)
 
 
 

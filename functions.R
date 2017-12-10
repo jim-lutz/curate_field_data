@@ -77,6 +77,32 @@ get_DT_uuid_data <- function(uuid = this_uuid, save_dir = wd_uuid){
 }
 
 
+get_sensorID_info <- function(uuid = this_uuid, save_dir = wd_uuid){
+  # function to get the number of records and the first & last times
+  # by sensorID
+  # returns a data.table
+  
+  # get the data
+  DT_uuid <- get_DT_uuid_data(this_uuid)
+  
+  # look by sensorID
+  DT_sensorID <-
+    DT_uuid[,list(uuid  = this_uuid,
+                  count = length(time),
+                  first = readUTCmilliseconds(min(time)),
+                  last  = readUTCmilliseconds(max(time))
+    ), by = value]
+  
+  # change value to sensorID
+  setnames(DT_sensorID,"value","sensorID")
+  setcolorder(DT_sensorID, c("uuid", "sensorID", "count", "first", "last"))
+  
+  # return the new data.table
+  return( DT_sensorID )
+  
+}
+
+
 
 
 put_SMAP_file <- function(this_fn = fn, save_dir = wd_save_uuid){

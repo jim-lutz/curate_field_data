@@ -61,6 +61,24 @@ put_DT_uuid_data <- function(l_data = data, save_dir = wd_uuid_data){
   
 }
 
+
+get_DT_uuid_data <- function(uuid = this_uuid, save_dir = wd_uuid){
+  # function to get the single SMAP data stream from a uuid file in wd_uuid_data
+  
+  # make the file name
+  uuid_fn = paste0(save_dir,uuid,".RData")
+  
+  # load the data.table
+  load(file = uuid_fn)
+  
+  # return the data.table
+  return(DT_uuid)
+  
+}
+
+
+
+
 put_SMAP_file <- function(this_fn = fn, save_dir = wd_save_uuid){
   # function to save all the SMAP data streams from one RSMAP file 
   # into uuid.RData files

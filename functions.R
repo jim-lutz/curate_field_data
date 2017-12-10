@@ -83,11 +83,11 @@ get_sensorID_info <- function(uuid = this_uuid, save_dir = wd_uuid){
   # returns a data.table
   
   # get the data
-  DT_uuid <- get_DT_uuid_data(this_uuid)
+  DT_uuid <- get_DT_uuid_data(uuid)
   
   # look by sensorID
   DT_sensorID <-
-    DT_uuid[,list(uuid  = this_uuid,
+    DT_uuid[,list(uuid,
                   count = length(time),
                   first = readUTCmilliseconds(min(time)),
                   last  = readUTCmilliseconds(max(time))

@@ -47,12 +47,22 @@ with(
 DT_meta2[sensortype %in% c("sensorA","sensorB"),list(moteID, sensortype, count)][order(-count)][1:25]
 # for a lot of these, there's same count on A and B
 
-# pick one of these
-this_uuid <- DT_meta2[moteID == 'x3295' & sensortype == 'sensorB',uuid]
+# get list of uuids that belong to sensors
+l_uuids <- DT_meta2[sensortype %in% c("sensorA","sensorB") & count > 0, uuid]
 
-# get the sensorID data.table for it
-DT_sensorID_info <- get_sensorID_info(this_uuid)
+# get the sensorID data.table for all those uuids
+DT_sensorID_info <- data.table(ldply(.data=l_uuids, .fun = get_sensorID_info, .progress= "text", .inform=TRUE))
 
+summary(DT_sensorID_info[,sensorID])
+  # Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+  #    0        0  4762096  2986168  4769099 12583168 
 
+qplot(DT_sensorID_info[,sensorID])
+sort(DT_sensorID_info[,sensorID])
+tail(sort(DT_sensorID_info[,sensorID]), n=50)
+
+DT_sensorID_info[,list(sensorID,count)][order(-count)]
+
+# looks like a lot of messy data
 
 

@@ -66,7 +66,21 @@ tail(sort(DT_sensorID_info[,sensorID]), n=50)
 DT_sensorID_info[,list(sensorID,count)][order(-count)]
 
 # looks like a lot of messy data
-# save DT_sensorID_info? merge sensortype off DT_meta2?
-# 
+# merge with sensortype and moteID off DT_meta2
+names(DT_meta2)
+DT_meta3 <- DT_meta2[,list(uuid,moteID,sensortype)]
+setkey(DT_meta3, uuid)
+
+names(DT_sensorID_info)
+setkey(DT_sensorID_info, uuid)
+
+DT_sensorID <- merge(DT_sensorID_info,DT_meta3)
+names(DT_sensorID)
+setcolorder(DT_sensorID, c("uuid", "moteID", "sensortype", "sensorID", "count", "first", "last"))
+setkey(DT_sensorID, moteID)
+
+# save DT_sensorID
+save(DT_sensorID, file = paste0(wd_data,"DT_sensorID.RData"))
+
 
 

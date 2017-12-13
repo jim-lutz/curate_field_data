@@ -49,6 +49,8 @@ DT_meta2[sensortype %in% c("sensorA","sensorB"),list(moteID, sensortype, count)]
 
 # get list of uuids that belong to sensors
 l_uuids <- DT_meta2[sensortype %in% c("sensorA","sensorB") & count > 0, uuid]
+length(l_uuids)
+# 700 of them
 
 # get the sensorID data.table for all those uuids
 DT_sensorID_info <- data.table(ldply(.data=l_uuids, .fun = get_sensorID_info, .progress= "text", .inform=TRUE))
@@ -64,5 +66,7 @@ tail(sort(DT_sensorID_info[,sensorID]), n=50)
 DT_sensorID_info[,list(sensorID,count)][order(-count)]
 
 # looks like a lot of messy data
+# save DT_sensorID_info? merge sensortype off DT_meta2?
+# 
 
 

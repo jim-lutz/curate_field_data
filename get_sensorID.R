@@ -68,7 +68,7 @@ DT_sensorID_info[,list(sensorID,count)][order(-count)]
 # looks like a lot of messy data
 # merge with sensortype and moteID off DT_meta2
 names(DT_meta2)
-DT_meta3 <- DT_meta2[,list(uuid,moteID,sensortype)]
+DT_meta3 <- DT_meta2[,list(uuid,houseID,moteID,sensortype)]
 setkey(DT_meta3, uuid)
 
 names(DT_sensorID_info)
@@ -76,7 +76,7 @@ setkey(DT_sensorID_info, uuid)
 
 DT_sensorID <- merge(DT_sensorID_info,DT_meta3)
 names(DT_sensorID)
-setcolorder(DT_sensorID, c("uuid", "moteID", "sensortype", "sensorID", "count", "first", "last"))
+setcolorder(DT_sensorID, c("uuid", "houseID", "moteID", "sensortype", "sensorID", "count", "first", "last"))
 setkey(DT_sensorID, moteID)
 
 # save DT_sensorID

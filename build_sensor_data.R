@@ -17,21 +17,19 @@ source("setup_wd.R")
 source("functions.R")
 
 # load the DT_sensorID data.table
-load(file = paste0(wd_data,"DT_sensorID.RData"))
+# load(file = paste0(wd_data,"DT_sensorID.RData"))
+# not using this for now.
 
 # load the DT_meta2 data.table
 load(file = paste0(wd_data,"DT_meta2.RData"))
 
 tables()
   #      NAME         NROW NCOL MB
-  # [1,] DT_meta2    2,947   16  1
-  # [2,] DT_sensorID 1,738    8  1
+  # [1,] DT_meta2 2,947   16  1
   #      COLS                                                                            
   # [1,] uuid,source,path,houseID,moteID,sensortype,units,type,study,model,timezone,drive
-  # [2,] uuid,houseID,moteID,sensortype,sensorID,count,first,last                        
-  #      KEY   
-  # [1,] uuid  
-  # [2,] moteID
+  #      KEY 
+  # [1,] uuid
 
 # find uuids for one sensor, one mote for one house
 # number of sensors by houseID
@@ -51,42 +49,99 @@ DT_meta2[houseID==4 & moteID=='x334f',list(sensortype, uuid, count )]
   # 6:      flowB b87eb256-14ca-5265-b948-4459ad79a625 225642
   # 7:  batt_volt fd1c0d8f-392b-59f9-96da-07de92ab7d3f 211442
 
-# get tempA and flowA
-DT_tempA <- get_DT_uuid_data("182d1615-9268-5836-b8fe-c0cd8012354f")
-setkey(DT_tempA,time)
-DT_flowA <- get_DT_uuid_data("5e530240-f53d-5250-89a4-336d84f285ba")
-setkey(DT_flowA,time)
-DT_sensor_data <- merge(DT_tempA,DT_flowA)
+# check to see if any moteID is used by more than one house
+DT_meta2[,list(n.moteIDs = length(uuid)), by = moteID][!is.na(moteID)][order(-n.moteIDs)]
+DT_meta2[!is.na(moteID),list(houseIDs = unique(houseID)), by = moteID][,list(n.houseIDs=length(houseIDs)),by = moteID][order(-n.houseIDs)]
+# check an interesting one
+DT_meta2[moteID=='x356a' & str_detect(sensortype, "tempA|flowA"), list(moteID,houseID, sensortype, count, first, last)][order(houseID,sensortype)]
+  #     moteID houseID sensortype  count                   first                    last
+  #  1:  x356a       2      flowA    217 2013-07-15 16:01:10 PDT 2013-07-24 16:34:36 PDT
+  #  2:  x356a       2      tempA    217 2013-07-15 16:01:10 PDT 2013-07-24 16:34:36 PDT
+  #  3:  x356a       4      flowA    511 2013-08-06 14:25:23 PDT 2013-08-06 17:35:24 PDT
+  #  4:  x356a       4      tempA    511 2013-08-06 14:25:23 PDT 2013-08-06 17:35:24 PDT
+  #  5:  x356a       7      flowA   2638 2013-08-07 08:42:50 PDT 2013-08-07 11:46:50 PDT
+  #  6:  x356a       7      tempA   2638 2013-08-07 08:42:50 PDT 2013-08-07 11:46:50 PDT
+  #  7:  x356a       9      flowA    677 2013-08-07 15:02:59 PDT 2013-08-07 16:58:59 PDT
+  #  8:  x356a       9      tempA    677 2013-08-07 15:02:59 PDT 2013-08-07 16:58:59 PDT
+  #  9:  x356a      11      flowA 408779 2013-08-09 12:27:08 PDT 2014-03-25 08:19:56 PDT
+  # 10:  x356a      11      tempA 408779 2013-08-09 12:27:08 PDT 2014-03-25 08:19:56 PDT
+  # 11:  x356a      14      flowA    448 2013-08-06 09:47:35 PDT 2013-08-06 11:58:36 PDT
+  # 12:  x356a      14      tempA    448 2013-08-06 09:47:35 PDT 2013-08-06 11:58:36 PDT
+  # 13:  x356a      NA      flowA   1358 2013-08-06 20:36:25 PDT 2013-08-07 23:14:29 PDT
+  # 14:  x356a      NA      tempA   1358 2013-08-06 20:36:25 PDT 2013-08-07 23:14:29 PDT
+# going to have to limit to one houseID at a time
 
-# fix the names
-setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
+this_houseID <- 11
+this_moteID  <- 'x356a'
+this_sensor  <- 'A'
 
-# add human readable time
-DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
+get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) {
+  # function to get temp and flow given houseID, moteID & sensor {A|B}
+  # this sensor is c("A","B")
+  
+  # check that both temp and flow data streams exist for this combination
+  temp.uuid <- DT_meta2[houseID    ==  this_houseID &
+                        moteID     ==  this_moteID &
+                        sensortype ==  paste0('temp', this_sensor), uuid]
+  flow.uuid <- DT_meta2[houseID    ==  this_houseID &
+                        moteID     ==  this_moteID &
+                        sensortype ==  paste0('flow', this_sensor), uuid]
+  # issue warnings if the uuid don't exist
+  if(nchar(temp.uuid)!=36) {warning(paste0('temp', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
+  if(nchar(flow.uuid)!=36) {warning(paste0('flow', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
+  
+  # get temp and flow
+  DT_temp <- get_DT_uuid_data(temp.uuid)
+  setkey(DT_temp,time)
+  DT_flow <- get_DT_uuid_data(flow.uuid)
+  setkey(DT_flow,time)
+  
+  # merge into one data.table
+  DT_sensor_data <- merge(DT_temp,DT_flow)
 
-# look at flows
+  # fix the names
+  setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
+
+  # add human readable time
+  DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
+  
+  # set flow -0.01 to 0
+  DT_sensor_data[flow==-0.01, flow:=0.0]
+
+  # return the data.table
+  return(DT_sensor_data)
+
+}
+  
+DT_sensor_data <- get.temp.and.flow(this_houseID = 11, 
+                                    this_moteID  = 'x356a',
+                                    this_sensor  = 'A',
+                                    DT_meta2)
+
+
+  # look at flows
 summary(DT_sensor_data[,flow])
 summary(DT_sensor_data[flow>0,flow])
 DT_sensor_data[, list(n=length(time)), by = (flow>0)]
-  #    flow      n
-  # 1: FALSE 224173
-  # 2:  TRUE   1468
+  #     flow      n
+  # 1: FALSE 373714
+  # 2:  TRUE  35065
 # not much flow
 DT_sensor_data[flow>0,]
 
-# why flow in October & again in March?
-str(DT_sensor_data)
+# look at total volume by week
 DT_sensor_data[,week.num := week(datetime)]
 DT_sensor_data[flow>0,list(vol=sum(flow/60), 
                            start.date=str_sub(readUTCmilliseconds(min(time)),1,10)
                           ),by = week.num]
-# not reading much flow, but otherwise looks OK.
+# looks OK.
 
 # look at temps
 summary(DT_sensor_data[,temp])
   #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  # 17.51   26.87   27.45   27.35   28.25   40.45 
-DT_sensor_data[temp>35][order(datetime)]
-DT_sensor_data[datetime>"2013-10-07 15:40" & datetime<"2013-10-07 16:00"][order(datetime)]
-
+  # 16.11   27.45   29.19   35.54   36.78   72.04 
+DT_sensor_data[       , list(n.records = length(time),
+                             ave.temp  = mean(temp)
+                             ), by = week.num]
+# Tstat setting for this one appears to be high!
 

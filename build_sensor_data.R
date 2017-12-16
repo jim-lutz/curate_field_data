@@ -107,6 +107,15 @@ this_houseID <- 11
 this_moteID  <- 'x356a'
 this_sensor  <- 'A'
 
+# check for multiple uuids with same houseID moteID sensortype
+DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB'), list(uuid)]
+# 1452 uuid files
+
+DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB'),
+         list(n.uuid = length(uuid)), 
+         by=c("houseID", "moteID", "sensortype")][order(-n.uuid)][n.uuid>1]
+# of which 115 have duplicate uuids
+
 # loop through all the houseIDs
 for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
 # for( hID in c(this_houseID) ){ # for debugging
@@ -140,10 +149,16 @@ for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
 
 
 DT_meta2[houseID    ==  1 &
-         moteID     ==  x34b8 &
+         moteID     ==  "x34b8" &
          sensortype ==  paste0('temp', 'A'), 
          uuid]
 
 DT_meta2[houseID    ==  1 &
          moteID     ==  "x34b8" &
          sensortype ==  paste0('temp', 'A'),]
+
+get.temp.and.flow(this_houseID=1, 
+                  this_moteID="x34b8", 
+                  this_sensor="tempA", 
+                  DT_meta2, humanreadable = TRUE)
+

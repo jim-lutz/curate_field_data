@@ -187,7 +187,7 @@ get_uuid_info <- function(fn_uuid){
   
 }
 
-get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) {
+get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2, humanreadable = FALSE) {
   # function to get temp and flow given houseID, moteID & sensor {A|B}
   # this sensor is c("A","B")
   
@@ -221,7 +221,7 @@ get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) 
   setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
   
   # add human readable time
-  # DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
+  if(humanreadable) {DT_sensor_data[,datetime:=readUTCmilliseconds(time)]}
   
   # set flow -0.01 to 0
   DT_sensor_data[flow==-0.01, flow:=0.0]

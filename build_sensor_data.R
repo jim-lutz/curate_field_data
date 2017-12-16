@@ -108,13 +108,52 @@ this_moteID  <- 'x356a'
 this_sensor  <- 'A'
 
 # check for multiple uuids with same houseID moteID sensortype
-DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB'), list(uuid)]
-# 1452 uuid files
+DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB') & !is.na(houseID), list(uuid)]
+# 1320 uuid files
 
-DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB'),
+DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB') & !is.na(houseID),
          list(n.uuid = length(uuid)), 
          by=c("houseID", "moteID", "sensortype")][order(-n.uuid)][n.uuid>1]
 # of which 115 have duplicate uuids
+
+# find the count, first and last for the data files for each combo
+DT_hms <-
+DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB') & !is.na(houseID),
+         list(uuid, count, first, last), 
+         by=c("houseID", "moteID", "sensortype")][order(houseID, moteID, sensortype)]
+
+# count number of uuids per combos of hms
+DT_hms[, n.hms:=length(uuid), by=c("houseID", "moteID", "sensortype")]
+
+# look at the multiples
+DT_hms[n.hms>1, unique(houseID)]
+# [1]  1  5 24
+
+# look at houseID ==1
+DT_hms[n.hms>1 & houseID==1,]
+# 113
+
+DT_hms[n.hms>1 & houseID==1, sort(unique(moteID))]
+DT_meta2[houseID==1, sort(unique(moteID))]
+# it's only a problem with some of the moteIDs in houseID 1
+
+# look at houseID ==5
+DT_hms[n.hms>1 & houseID==5,]
+# 86
+
+DT_hms[n.hms>1 & houseID==5, sort(unique(moteID))]
+DT_meta2[houseID==5, sort(unique(moteID))]
+
+# look at houseID ==24
+DT_hms[n.hms>1 & houseID==24,]
+# 64
+
+DT_hms[n.hms>1 & houseID==24, sort(unique(moteID))]
+DT_meta2[houseID==24, sort(unique(moteID))]
+# all but 1 of the moteIDs for houseID 24
+
+
+
 
 # loop through all the houseIDs
 for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){

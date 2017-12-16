@@ -16,20 +16,9 @@ source("setup_wd.R")
 # call useful functions
 source("functions.R")
 
-# load the DT_sensorID data.table
-# load(file = paste0(wd_data,"DT_sensorID.RData"))
-# not using this for now.
-
 # load the DT_meta2 data.table
 load(file = paste0(wd_data,"DT_meta2.RData"))
 
-tables()
-  #      NAME         NROW NCOL MB
-  # [1,] DT_meta2 2,947   16  1
-  #      COLS                                                                            
-  # [1,] uuid,source,path,houseID,moteID,sensortype,units,type,study,model,timezone,drive
-  #      KEY 
-  # [1,] uuid
 
 # find uuids for one sensor, one mote for one house
 # number of sensors by houseID
@@ -75,44 +64,6 @@ this_houseID <- 11
 this_moteID  <- 'x356a'
 this_sensor  <- 'A'
 
-get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) {
-  # function to get temp and flow given houseID, moteID & sensor {A|B}
-  # this sensor is c("A","B")
-  
-  # check that both temp and flow data streams exist for this combination
-  temp.uuid <- DT_meta2[houseID    ==  this_houseID &
-                        moteID     ==  this_moteID &
-                        sensortype ==  paste0('temp', this_sensor), uuid]
-  flow.uuid <- DT_meta2[houseID    ==  this_houseID &
-                        moteID     ==  this_moteID &
-                        sensortype ==  paste0('flow', this_sensor), uuid]
-  # issue warnings if the uuid don't exist
-  if(nchar(temp.uuid)!=36) {warning(paste0('temp', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
-  if(nchar(flow.uuid)!=36) {warning(paste0('flow', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
-  
-  # get temp and flow
-  DT_temp <- get_DT_uuid_data(temp.uuid)
-  setkey(DT_temp,time)
-  DT_flow <- get_DT_uuid_data(flow.uuid)
-  setkey(DT_flow,time)
-  
-  # merge into one data.table
-  DT_sensor_data <- merge(DT_temp,DT_flow)
-
-  # fix the names
-  setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
-
-  # add human readable time
-  DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
-  
-  # set flow -0.01 to 0
-  DT_sensor_data[flow==-0.01, flow:=0.0]
-
-  # return the data.table
-  return(DT_sensor_data)
-
-}
-  
 DT_sensor_data <- get.temp.and.flow(this_houseID = 11, 
                                     this_moteID  = 'x356a',
                                     this_sensor  = 'A',
@@ -149,3 +100,37 @@ DT_sensor_data[       , list(n.records = length(time),
 
 # build lists of moteIDs by houseID
 DT_meta2[!is.na(moteID) & !is.na(houseID) ,list(moteID),by = houseID][order(houseID)]
+
+this_houseID <- 11
+this_moteID  <- 'x356a'
+this_sensor  <- 'A'
+
+# loop through all the houseIDs
+# for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
+for( hID in c(this_houseID) ){ # for debugging
+  cat(hID,"\n")
+  
+  # loop through all the moteIDs 
+  for( mID in DT_meta2[houseID==hID,sort(unique(moteID))] ){
+#  for( mID in c(this_moteID) ){ # for debugging
+  cat("\t",mID,"\n")
+    
+    # look for both A & B sensors
+    for( s in c('A', 'B')){
+      cat("\t\t",s,"\n")
+      
+      # build the filename to store the data.table in
+      fn_DT <- paste0(wd_data,"sensors/DT_",hID,"_",mID,'_',s,".xz.Rdata")
+      cat(fn_DT,"\n")
+      
+      # get the temp & flow data
+      DT <- get.temp.and.flow(hID, mID, s, DT_meta2)
+      
+      # store the data, use xz compression
+      save(DT, file = fn_DT, compress = "xz")
+      
+    }
+    
+  }
+    
+}

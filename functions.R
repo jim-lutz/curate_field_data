@@ -193,14 +193,20 @@ get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) 
   
   # check that both temp and flow data streams exist for this combination
   temp.uuid <- DT_meta2[houseID    ==  this_houseID &
-                          moteID     ==  this_moteID &
-                          sensortype ==  paste0('temp', this_sensor), uuid]
+                        moteID     ==  this_moteID &
+                        sensortype ==  paste0('temp', this_sensor), uuid]
   flow.uuid <- DT_meta2[houseID    ==  this_houseID &
-                          moteID     ==  this_moteID &
-                          sensortype ==  paste0('flow', this_sensor), uuid]
+                        moteID     ==  this_moteID &
+                        sensortype ==  paste0('flow', this_sensor), uuid]
   # issue warnings if the uuid don't exist
-  if(nchar(temp.uuid)!=36) {warning(paste0('temp', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
-  if(nchar(flow.uuid)!=36) {warning(paste0('flow', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
+  if( is.null(temp.uuid) | nchar(temp.uuid)!=36) {
+    warning(paste0('temp', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))
+    return()    
+    }  
+  if(nchar(flow.uuid)!=36) {
+    warning(paste0('flow', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))
+    return()    
+  }  
   
   # get temp and flow
   DT_temp <- get_DT_uuid_data(temp.uuid)
@@ -215,7 +221,7 @@ get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) 
   setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
   
   # add human readable time
-  DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
+  # DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
   
   # set flow -0.01 to 0
   DT_sensor_data[flow==-0.01, flow:=0.0]

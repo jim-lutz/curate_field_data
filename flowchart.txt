@@ -15,15 +15,24 @@ get_uuid_data.R
           ../retrieve_field_data/data/by_uuid/*.RData
   output: ./data/uuid/*.RData
   
-# get_all_meta.R
+get_all_meta.R
   script to collect all the meta information in
   input:  ../retrieve_field_data/data/DT_tags_raw.RData
   output: ./data/DT_meta.RData
   
-# get_uuid_meta2.R
+get_uuid_meta2.R
   script to collect number of records, start and end dates of each uuid data stream
   input:  ./data/DT_meta.RData
           ./data/uuid/*.RData
   output: ./DT_meta2.RData
+  
+get_sensorID.R  
+    script to get the sensorID values out of the sensorA and sensorB uuid data streams
+    input:  ./DT_meta2.RData
+            ./data/uuid/*.RData
+    output: DT_sensorID.RData
+  
+build_sensor_data.R
+    # script to build sensor data files
   
   

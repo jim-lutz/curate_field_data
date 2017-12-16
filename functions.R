@@ -102,9 +102,6 @@ get_sensorID_info <- function(uuid = this_uuid, save_dir = wd_uuid){
   
 }
 
-
-
-
 put_SMAP_file <- function(this_fn = fn, save_dir = wd_save_uuid){
   # function to save all the SMAP data streams from one RSMAP file 
   # into uuid.RData files
@@ -187,6 +184,44 @@ get_uuid_info <- function(fn_uuid){
                     first = first,
                     last  = last)
   )
+  
+}
+
+get.temp.and.flow <- function(this_houseID, this_moteID, this_sensor, DT_meta2) {
+  # function to get temp and flow given houseID, moteID & sensor {A|B}
+  # this sensor is c("A","B")
+  
+  # check that both temp and flow data streams exist for this combination
+  temp.uuid <- DT_meta2[houseID    ==  this_houseID &
+                          moteID     ==  this_moteID &
+                          sensortype ==  paste0('temp', this_sensor), uuid]
+  flow.uuid <- DT_meta2[houseID    ==  this_houseID &
+                          moteID     ==  this_moteID &
+                          sensortype ==  paste0('flow', this_sensor), uuid]
+  # issue warnings if the uuid don't exist
+  if(nchar(temp.uuid)!=36) {warning(paste0('temp', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
+  if(nchar(flow.uuid)!=36) {warning(paste0('flow', this_sensor, " does not exist for house ", this_houseID," mote ", this_moteID))}  
+  
+  # get temp and flow
+  DT_temp <- get_DT_uuid_data(temp.uuid)
+  setkey(DT_temp,time)
+  DT_flow <- get_DT_uuid_data(flow.uuid)
+  setkey(DT_flow,time)
+  
+  # merge into one data.table
+  DT_sensor_data <- merge(DT_temp,DT_flow)
+  
+  # fix the names
+  setnames(DT_sensor_data, old = c("value.x","value.y"), new = c("temp","flow"))
+  
+  # add human readable time
+  DT_sensor_data[,datetime:=readUTCmilliseconds(time)]
+  
+  # set flow -0.01 to 0
+  DT_sensor_data[flow==-0.01, flow:=0.0]
+  
+  # return the data.table
+  return(DT_sensor_data)
   
 }
 

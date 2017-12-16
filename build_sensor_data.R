@@ -50,8 +50,8 @@ DT_meta2[houseID==4 & moteID=='x334f',list(sensortype, uuid, count )]
   # 7:  batt_volt fd1c0d8f-392b-59f9-96da-07de92ab7d3f 211442
 
 # check to see if any moteID is used by more than one house
-DT_meta2[,list(n.moteIDs = length(uuid)), by = moteID][!is.na(moteID)][order(-n.moteIDs)]
-DT_meta2[!is.na(moteID),list(houseIDs = unique(houseID)), by = moteID][,list(n.houseIDs=length(houseIDs)),by = moteID][order(-n.houseIDs)]
+DT_houseIDs_moteID <- DT_meta2[!is.na(moteID),list(houseIDs = unique(houseID)), by = moteID][,list(n.houseIDs=length(houseIDs)),by = moteID][order(-n.houseIDs)]
+qplot(DT_houseIDs_moteID$n.houseIDs)
 # check an interesting one
 DT_meta2[moteID=='x356a' & str_detect(sensortype, "tempA|flowA"), list(moteID,houseID, sensortype, count, first, last)][order(houseID,sensortype)]
   #     moteID houseID sensortype  count                   first                    last
@@ -122,6 +122,7 @@ DT_sensor_data <- get.temp.and.flow(this_houseID = 11,
   # look at flows
 summary(DT_sensor_data[,flow])
 summary(DT_sensor_data[flow>0,flow])
+qplot(DT_sensor_data[flow>0,flow])
 DT_sensor_data[, list(n=length(time)), by = (flow>0)]
   #     flow      n
   # 1: FALSE 373714
@@ -140,8 +141,11 @@ DT_sensor_data[flow>0,list(vol=sum(flow/60),
 summary(DT_sensor_data[,temp])
   #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
   # 16.11   27.45   29.19   35.54   36.78   72.04 
+# average temperature by week
 DT_sensor_data[       , list(n.records = length(time),
                              ave.temp  = mean(temp)
                              ), by = week.num]
 # Tstat setting for this one appears to be high!
 
+# build lists of moteIDs by houseID
+DT_meta2[!is.na(moteID) & !is.na(houseID) ,list(moteID),by = houseID][order(houseID)]

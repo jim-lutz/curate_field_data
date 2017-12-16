@@ -60,54 +60,56 @@ DT_meta2[moteID=='x356a' & str_detect(sensortype, "tempA|flowA"), list(moteID,ho
   # 14:  x356a      NA      tempA   1358 2013-08-06 20:36:25 PDT 2013-08-07 23:14:29 PDT
 # going to have to limit to one houseID at a time
 
-this_houseID <- 11
-this_moteID  <- 'x356a'
-this_sensor  <- 'A'
-
-DT_sensor_data <- get.temp.and.flow(this_houseID = 11, 
-                                    this_moteID  = 'x356a',
-                                    this_sensor  = 'A',
-                                    DT_meta2)
-
-
-  # look at flows
-summary(DT_sensor_data[,flow])
-summary(DT_sensor_data[flow>0,flow])
-qplot(DT_sensor_data[flow>0,flow])
-DT_sensor_data[, list(n=length(time)), by = (flow>0)]
-  #     flow      n
-  # 1: FALSE 373714
-  # 2:  TRUE  35065
-# not much flow
-DT_sensor_data[flow>0,]
-
-# look at total volume by week
-DT_sensor_data[,week.num := week(datetime)]
-DT_sensor_data[flow>0,list(vol=sum(flow/60), 
-                           start.date=str_sub(readUTCmilliseconds(min(time)),1,10)
-                          ),by = week.num]
-# looks OK.
-
-# look at temps
-summary(DT_sensor_data[,temp])
-  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  # 16.11   27.45   29.19   35.54   36.78   72.04 
-# average temperature by week
-DT_sensor_data[       , list(n.records = length(time),
-                             ave.temp  = mean(temp)
-                             ), by = week.num]
+# save this for later inspections and cleaning
+# this_houseID <- 11
+# this_moteID  <- 'x356a'
+# this_sensor  <- 'A'
+# 
+# DT_sensor_data <- get.temp.and.flow(this_houseID = 11, 
+#                                     this_moteID  = 'x356a',
+#                                     this_sensor  = 'A',
+#                                     DT_meta2)
+# 
+# 
+#   # look at flows
+# summary(DT_sensor_data[,flow])
+# summary(DT_sensor_data[flow>0,flow])
+# qplot(DT_sensor_data[flow>0,flow])
+# DT_sensor_data[, list(n=length(time)), by = (flow>0)]
+#   #     flow      n
+#   # 1: FALSE 373714
+#   # 2:  TRUE  35065
+# # not much flow
+# DT_sensor_data[flow>0,]
+# 
+# # look at total volume by week
+# DT_sensor_data[,week.num := week(datetime)]
+# DT_sensor_data[flow>0,list(vol=sum(flow/60), 
+#                            start.date=str_sub(readUTCmilliseconds(min(time)),1,10)
+#                           ),by = week.num]
+# # looks OK.
+# 
+# # look at temps
+# summary(DT_sensor_data[,temp])
+#   #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#   # 16.11   27.45   29.19   35.54   36.78   72.04 
+# # average temperature by week
+# DT_sensor_data[       , list(n.records = length(time),
+#                              ave.temp  = mean(temp)
+#                              ), by = week.num]
 # Tstat setting for this one appears to be high!
 
-# build lists of moteIDs by houseID
+# lists of moteIDs by houseID
 DT_meta2[!is.na(moteID) & !is.na(houseID) ,list(moteID),by = houseID][order(houseID)]
 
+# for debugging
 this_houseID <- 11
 this_moteID  <- 'x356a'
 this_sensor  <- 'A'
 
 # loop through all the houseIDs
-# for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
-for( hID in c(this_houseID) ){ # for debugging
+for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
+# for( hID in c(this_houseID) ){ # for debugging
   cat(hID,"\n")
   
   # loop through all the moteIDs 
@@ -121,6 +123,7 @@ for( hID in c(this_houseID) ){ # for debugging
       
       # build the filename to store the data.table in
       fn_DT <- paste0(wd_data,"sensors/DT_",hID,"_",mID,'_',s,".xz.Rdata")
+      cat(hID,"\t",mID,"\t",s)
       cat(fn_DT,"\n")
       
       # get the temp & flow data
@@ -134,3 +137,13 @@ for( hID in c(this_houseID) ){ # for debugging
   }
     
 }
+
+
+DT_meta2[houseID    ==  1 &
+         moteID     ==  x34b8 &
+         sensortype ==  paste0('temp', 'A'), 
+         uuid]
+
+DT_meta2[houseID    ==  1 &
+         moteID     ==  "x34b8" &
+         sensortype ==  paste0('temp', 'A'),]

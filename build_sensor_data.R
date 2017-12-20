@@ -153,7 +153,9 @@ for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
       # get uuids for temp data streams for this combination
       temp.uuid <- DT_meta2[houseID      ==  hID &
                               moteID     ==  mID &
-                              sensortype ==  paste0('temp', s), uuid]
+                              sensortype ==  paste0('temp', s) &
+                              count      > 0, 
+                            uuid]
       
       # write temp.uuids to log file
       cat("\t", 'temp', "\n", file = "hms.log", append = TRUE)
@@ -162,7 +164,9 @@ for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
       # get uuids for flow data streams for this combination
       flow.uuid <- DT_meta2[houseID      ==  hID &
                               moteID     ==  mID &
-                              sensortype ==  paste0('flow', s), uuid]
+                              sensortype ==  paste0('flow', s) &
+                              count      > 0,
+                            uuid]
      
       # write flow.uuids to log file
       cat("\t", 'flow', "\n", file = "hms.log", append = TRUE)

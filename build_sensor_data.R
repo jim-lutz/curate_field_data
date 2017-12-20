@@ -19,28 +19,10 @@ source("functions.R")
 # load the DT_meta2 data.table
 load(file = paste0(wd_data,"DT_meta2.RData"))
 
-
-# find uuids for one sensor, one mote for one house
-# number of sensors by houseID
-DT_meta2[,list(n.sensors=length(sensortype)),by = houseID][!is.na(houseID),][order(houseID)]
-
-# number of sensors by mote for house 4
-DT_meta2[houseID==4,list(n.sensors=length(sensortype)),by = moteID][!is.na(moteID),]
-
-# sensors for one moteID
-DT_meta2[houseID==4 & moteID=='x334f',list(sensortype, uuid, count )]
-  #    sensortype                                 uuid  count
-  # 1:    sensorB 1260d952-2370-5861-b7ea-da415880b1dd 211442
-  # 2:      tempA 182d1615-9268-5836-b8fe-c0cd8012354f 225641
-  # 3:      tempB 4018e7a3-d535-595a-a682-95c8d2238cda 225640
-  # 4:      flowA 5e530240-f53d-5250-89a4-336d84f285ba 225642
-  # 5:    sensorA a811afa7-1390-5e44-95a5-07da332d3b59 211442
-  # 6:      flowB b87eb256-14ca-5265-b948-4459ad79a625 225642
-  # 7:  batt_volt fd1c0d8f-392b-59f9-96da-07de92ab7d3f 211442
-
 # check to see if any moteID is used by more than one house
 DT_houseIDs_moteID <- DT_meta2[!is.na(moteID),list(houseIDs = unique(houseID)), by = moteID][,list(n.houseIDs=length(houseIDs)),by = moteID][order(-n.houseIDs)]
 qplot(DT_houseIDs_moteID$n.houseIDs)
+
 # check an interesting one
 DT_meta2[moteID=='x356a' & str_detect(sensortype, "tempA|flowA"), list(moteID,houseID, sensortype, count, first, last)][order(houseID,sensortype)]
   #     moteID houseID sensortype  count                   first                    last
@@ -102,10 +84,10 @@ DT_meta2[moteID=='x356a' & str_detect(sensortype, "tempA|flowA"), list(moteID,ho
 # lists of moteIDs by houseID
 DT_meta2[!is.na(moteID) & !is.na(houseID) ,list(moteID),by = houseID][order(houseID)]
 
-# for debugging
-this_houseID <- 11
-this_moteID  <- 'x356a'
-this_sensor  <- 'A'
+# # for debugging
+# this_houseID <- 11
+# this_moteID  <- 'x356a'
+# this_sensor  <- 'A'
 
 # check for multiple uuids with same houseID moteID sensortype
 DT_meta2[sensortype %in% c('tempA','flowA','tempB','flowB') & !is.na(houseID), list(uuid)]
@@ -153,32 +135,52 @@ DT_meta2[houseID==24, sort(unique(moteID))]
 # all but 1 of the moteIDs for houseID 24
 
 
-
+# create a log file to track/debug progress
+cat("houseID \t> moteID \t> sensor \t> uuid\n", file = "hms.log", append = FALSE)
 
 # loop through all the houseIDs
 for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
 # for( hID in c(this_houseID) ){ # for debugging
-  cat(hID,"\n")
   
   # loop through all the moteIDs 
   for( mID in DT_meta2[houseID==hID,sort(unique(moteID))] ){
 #  for( mID in c(this_moteID) ){ # for debugging
-  cat("\t",mID,"\n")
     
     # look for both A & B sensors
     for( s in c('A', 'B')){
-      cat("\t\t",s,"\n")
+      cat(hID,"\t> ",mID,"\t> ",s,"\n", file = "hms.log", append = TRUE)
       
-      # build the filename to store the data.table in
-      fn_DT <- paste0(wd_data,"sensors/DT_",hID,"_",mID,'_',s,".xz.Rdata")
-      cat(hID,"\t",mID,"\t",s)
-      cat(fn_DT,"\n")
+      # get uuids for temp data streams for this combination
+      temp.uuid <- DT_meta2[houseID      ==  hID &
+                              moteID     ==  mID &
+                              sensortype ==  paste0('temp', s), uuid]
       
-      # get the temp & flow data
-      DT <- get.temp.and.flow(hID, mID, s, DT_meta2)
+      # write temp.uuids to log file
+      cat("\t", 'temp', "\n", file = "hms.log", append = TRUE)
+      cat("\t\t",temp.uuid,"\n", file = "hms.log", append = TRUE)
       
-      # store the data, use xz compression
-      save(DT, file = fn_DT, compress = "xz")
+      # get uuids for flow data streams for this combination
+      flow.uuid <- DT_meta2[houseID      ==  hID &
+                              moteID     ==  mID &
+                              sensortype ==  paste0('flow', s), uuid]
+     
+      # write flow.uuids to log file
+      cat("\t", 'flow', "\n", file = "hms.log", append = TRUE)
+      cat("\t\t",flow.uuid,"\n", file = "hms.log", append = TRUE)
+      
+      # process only if one temp and flow data stream exists for this combination
+      if(length(temp.uuid)==1 & length(flow.uuid)==1) {
+        # build the filename to store the data.table in
+        fn_DT <- paste0(wd_data,"sensors/DT_",hID,"_",mID,'_',s,".xz.Rdata")
+        cat(fn_DT,"\n")
+      
+        # get the temp & flow data
+        DT <- get.temp.and.flow(hID, mID, s, DT_meta2)
+      
+        # store the data, use xz compression
+        save(DT, file = fn_DT, compress = "xz")
+        
+      }
       
     }
     

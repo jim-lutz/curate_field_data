@@ -188,18 +188,41 @@ for( hID in DT_meta2[!is.na(houseID),sort(unique(houseID))] ){
     
 }
 
+# choked after 
+# 3 	>  x3443 	>  A 
+# temp 
+# d429c4bf-21c7-5dff-8e1c-7c999cf5bc49 
+# flow 
+# 02405629-a98c-5f28-9bb2-b777519f35fd 
 
-DT_meta2[houseID    ==  1 &
-         moteID     ==  "x34b8" &
+# see what the problem was
+DT_meta2[houseID    ==  3 &
+         moteID     ==  "x3443" &
          sensortype ==  paste0('temp', 'A'), 
          uuid]
 
-DT_meta2[houseID    ==  1 &
-         moteID     ==  "x34b8" &
-         sensortype ==  paste0('temp', 'A'),]
+DT_meta2[houseID    ==  3 &
+         moteID     ==  "x3443" &
+         sensortype ==  paste0('flow', 'A'), 
+         uuid]
 
-get.temp.and.flow(this_houseID=1, 
-                  this_moteID="x34b8", 
-                  this_sensor="tempA", 
+get.temp.and.flow(this_houseID=3, 
+                  this_moteID="x3443", 
+                  this_sensor="A", 
                   DT_meta2, humanreadable = TRUE)
+
+# make the file name
+uuid_fn = paste0(wd_uuid,"d429c4bf-21c7-5dff-8e1c-7c999cf5bc49",".RData")
+
+# load the data.table
+load(file = uuid_fn)
+
+# cannot open compressed file '/home/jiml/HotWaterResearch/projects/HWDS monitoring/curate_field_data/data/uuid/d429c4bf-21c7-5dff-8e1c-7c999cf5bc49.RData', probable reason 'No such file or directory'
+
+DT_meta2[houseID    ==  3 &
+           moteID     ==  "x3443" &
+           sensortype ==  paste0('temp', 'A'),
+         ]
+#                          driver other count first last
+# 1: smap.drivers.mote.MoteDriver    NA    NA    NA   NA
 
